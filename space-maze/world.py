@@ -1,8 +1,8 @@
 MAP_WIDTH = MAP_HEIGHT = 8
 
 LEVEL = """\
-####### #########
-#               #
+#######X#########
+X               #
 # ##### ####### #
 # #   # #       #
 # ### # # #######
@@ -13,21 +13,24 @@ LEVEL = """\
 #   #   #   #   #
 ####### # #######
 # #     #       #
-# # ########### #
+# # ########### X
 #   #           #
 # ### ######### #
 #   #     #     #
-######### #######\
+###X#####X#######\
 """.split("\n")
 
+LEVEL = [
+    list(line) for line in LEVEL
+]
 # convert into walls
-X_WALLS = [
-    [LEVEL[2*y+1][2*x]=='#' for x in range(9)] for y in range(8)
-]
+# X_WALLS = [
+#     [LEVEL[2*y+1][2*x]=='#' for x in range(9)] for y in range(8)
+# ]
 
-Y_WALLS = [
-    [LEVEL[2*y][2*x+1] == '#' for x in range(8)] for y in range(9)
-]
+# Y_WALLS = [
+#     [LEVEL[2*y][2*x+1] == '#' for x in range(8)] for y in range(9)
+# ]
 
 # WORLD = dict(
 #     MAP=LEVEL,

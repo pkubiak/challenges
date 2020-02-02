@@ -3,6 +3,35 @@ import sys
 
 wrt = sys.stdout.write
 
+def lighten(color, scale):
+    r, g, b, blink = color
+
+    factor = 1.0 + scale
+    return (
+        max(min(255, int(r * factor)), 0),
+        max(min(255, int(g * factor)), 0),
+        max(min(255, int(b * factor)), 0),
+        blink
+    )
+
+DEFAULT_FONT={
+    ' ': (1, [0, 0, 0, 0, 0]),
+    '0': (3, [7, 5, 5, 5, 7]),
+    '1': (2, [3, 1, 1, 1, 1]),
+    '2': (3, [7, 1, 7, 4, 7]),
+    '3': (3, [7, 1, 3, 1, 7]),
+    '4': (3, [4, 5, 7, 1, 1]),
+    '5': (3, [7, 4, 7, 1, 7]),
+    '6': (3, [7, 4, 7, 5, 7]),
+    '7': (3, [7, 1, 1, 1, 1]),
+    '8': (3, [7, 5, 7, 5, 7]),
+    '9': (3, [7, 5, 7, 1, 7]),
+    'W': (5, [17, 17, 21, 21, 10]),
+    'E': (3, [7, 4, 6, 4, 7]),
+    'N': (4, [9, 13, 15, 11, 9]),
+    'S': (3, [3, 4, 2, 1, 6]),
+}
+
 class Screen:
     BLOCK = '██'
     
@@ -100,6 +129,17 @@ class Screen:
             for y in range(y0, y1+1):
                 self[x, y] = color
 
+    def puttext(self, x0, y0, text, color, font=DEFAULT_FONT):
+        offset = 0
+        for char in text:
+            length, glyph = font[char]
+            for y in range(len(glyph)):
+                for x in range(length):
+                    if glyph[y] & (1<<(length-1-x)):
+                        self[offset+x+x0, y+y0] = color
+            offset += length + 1
+
+
     def sync(self):
         wrt("\033[2J")  # clear entire screen
         for y in range(self.height):
@@ -108,7 +148,8 @@ class Screen:
                 r, g, b, blink = self.data[y][x]
 
                 if blink:
-                    wrt(f"\033[5m\033[48;2;{r//4};{g//4};{b//4}m") # blinking color
+                    r2, g2, b2, _ = lighten((r, g, b, True),0.6)
+                    wrt(f"\033[5m\033[48;2;{r2};{g2};{b2}m") # blinking color
 
                 wrt(f"\033[38;2;{r};{g};{b}m%s\033[0m" % self.BLOCK)  # print block in given RGB color
 
